@@ -29,16 +29,17 @@ func Fetch(url string) (string, error) {
 }
 
 func GetSecondId(data string) ([]string, int) {
-	var Data pkg.Data
-	err := json.Unmarshal([]byte(data), &Data)
+	var replyData pkg.ReplyData
+	err := json.Unmarshal([]byte(data), &replyData)
 	if err != nil {
 		return nil, 0
 	}
-	ids := make([]string, len(Data.Replies))
-	for i, reply := range Data.Replies {
+
+	ids := make([]string, len(replyData.Data.Replies))
+	for i, reply := range replyData.Data.Replies {
 		ids[i] = reply.Rpid
 	}
-	return ids, Data.Page.Num
+	return ids, replyData.Data.Page.Num
 }
 
 func CheckAndWriteToFile(filename string, content string) error {

@@ -3,16 +3,15 @@ package pkg
 import "regexp"
 
 // 定义数据结构以解析JSON
-type Data struct {
-	Replies []Reply `json:"replies"`
-	Page    Page    `json:"page"`
-}
-
-type Reply struct {
-	Rpid string `json:"rpid"`
-}
-type Page struct {
-	Num int `json:"num"`
+type ReplyData struct {
+	Data struct {
+		Replies []struct {
+			Rpid string `json:"rpid"`
+		} `json:"replies"`
+		Page struct {
+			Num int `json:"num"`
+		} `json:"page"`
+	} `json:"data"`
 }
 
 // 正则表达式全局变量
