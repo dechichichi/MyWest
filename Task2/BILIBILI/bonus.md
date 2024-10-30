@@ -1,4 +1,0 @@
-Bonus
-给出Bilibili爬虫检测阈值（请求频率高于这个阈值将会被ban。也可以是你被封时的请求频率）
-给出爬取的流程图，使用mermaid或者excalidraw
-给出接口返回的json中每个参数所代表的意义
