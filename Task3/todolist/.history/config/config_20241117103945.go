@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"todolist/model"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -24,12 +25,9 @@ func Init() {
 	}
 	LoadServer(file)
 	LoadDb(file)
-	//dsn := fmt.Sprintf("%s:%s@/%s?charset=utf8mb4&parseTime=True&loc=Local", Dbuser, Dbpassword, Dbdatabase)
-	dsn := "root:Ly05985481282@/todolistuser?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := fmt.Sprintf("%s:%s@/%s?charset=utf8mb4&parseTime=True&loc=Local", Dbuser, Dbpassword, Dbdatabase)
 	//localhost:Ly05985481282@/todolist?charset=utf8mb4&parseTime=True&loc=Local
-	model.UserInit(dsn)
-	dsn = "root:Ly05985481282@/todolistdata?charset=utf8mb4&parseTime=True&loc=Local"
-	model.DataInit(dsn)
+	model.DbInit(dsn)
 }
 
 func LoadServer(file *ini.File) {
