@@ -23,7 +23,7 @@ type User struct {
 	ID       string `gorm:"primaryKey"`
 	Password string `gorm:"type:varchar(50)"`
 	Data     Data   `gorm:"embedded"`
-	Email    string `gorm:"type:varchar(50);uniqueIndex"`
+	EMail    string `gorm:"type:varchar(50);uniqueIndex"`
 }
 
 func UserInit(consstring string) {
