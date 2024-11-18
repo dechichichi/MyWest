@@ -12,6 +12,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type HertzJWTMiddleware struct {
+	Key     []byte
+	Timeout time.Duration
+}
+
 // 用户登录处理函数
 func Login(w http.ResponseWriter, r *http.Request) {
 	// 从请求中获取用户名和密码
@@ -62,18 +67,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 发送 Token 给客户端
-	ctx := context.Background()                  // 获取 context
-	statusCode := http.StatusOK                  // 设置状态码
-	message := "Login successful"                // 设置消息
-	expiration := time.Now().Add(24 * time.Hour) // 设置过期时间
-
-	requestCtx := app.NewRequestContext(r, w) // 获取请求上下文
-	authMiddleware.LoginResponse(ctx, requestCtx, statusCode, message, expiration)
-
+	tokenString, err := authMiddleware.GenerateToken(user)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Authorization", tokenString)
 	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Login successful"))
@@ -83,4 +82,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 type HertzJWTMiddleware struct {
 	Key     []byte
 	Timeout time.Duration
+}
+
+// GenerateToken 生成JWT Token
+func (j *HertzJWTMiddleware) GenerateToken(identity interface{}) (string, error) {
+	claims := jwt.MapClaims{
+		"exp":      time.Now().Add(j.Timeout).Unix(),
+		"iat":      time.Now().Unix(),
+		"nbf":      time.Now().Unix(),
+		"identity": identity,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(j.Key)
 }

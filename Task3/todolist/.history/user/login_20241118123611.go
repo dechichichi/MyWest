@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 	"time"
-	"todolist/model"
-	"todolist/task"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/jwt"
@@ -41,17 +39,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Timeout:     time.Hour * 24, // 设置JWT的过期时间为24小时
 		IdentityKey: "username",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*model.User); ok {
+			if v, ok := data.(*task.User); ok {
 				return jwt.MapClaims{
-					"username": v.ID,
+					"username": v.Username,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-			return &model.User{
-				ID: claims["username"].(string),
+			return &task.User{
+				Username: claims["username"].(string),
 			}
 		},
 	})
@@ -62,25 +60,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 发送 Token 给客户端
-	ctx := context.Background()                  // 获取 context
-	statusCode := http.StatusOK                  // 设置状态码
-	message := "Login successful"                // 设置消息
-	expiration := time.Now().Add(24 * time.Hour) // 设置过期时间
-
-	requestCtx := app.NewRequestContext(r, w) // 获取请求上下文
-	authMiddleware.LoginResponse(ctx, requestCtx, statusCode, message, expiration)
-
+	token, expire, err := authMiddleware.Encode(user)
 	if err != nil {
-		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		http.Error(w, "Error encoding token", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Authorization", token)
 	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Login successful"))
-}
-
-// GenerateToken 生成JWT Token
-type HertzJWTMiddleware struct {
-	Key     []byte
-	Timeout time.Duration
 }

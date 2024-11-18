@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"time"
+
 	"todolist/model"
 	"todolist/task"
 
@@ -48,11 +49,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			}
 			return jwt.MapClaims{}
 		},
-		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
+		IdentityHandler: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			claims := jwt.ExtractClaims(ctx, c)
-			return &model.User{
-				ID: claims["username"].(string),
+			id := claims["username"].(string)
+			// 这里需要根据实际情况查询数据库获取用户信息
+			// 假设我们已经有了用户ID，现在需要从数据库中获取用户对象
+			user, err := task.AskByID(id)
+			if err != nil {
+				return nil, err
 			}
+			return user, nil
 		},
 	})
 	if err != nil {
@@ -62,25 +68,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 发送 Token 给客户端
-	ctx := context.Background()                  // 获取 context
-	statusCode := http.StatusOK                  // 设置状态码
-	message := "Login successful"                // 设置消息
-	expiration := time.Now().Add(24 * time.Hour) // 设置过期时间
-
-	requestCtx := app.NewRequestContext(r, w) // 获取请求上下文
-	authMiddleware.LoginResponse(ctx, requestCtx, statusCode, message, expiration)
-
+	tokenString, expire, err := authMiddleware.GenerateToken(user)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Authorization", tokenString)
 	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth_token",
+		Value:    tokenString,
+		Expires:  time.Now().Add(time.Hour * 24), // 设置cookie过期时间为24小时
+		HttpOnly: true,
+		Secure:   true, // 如果是https站点，设置为true
+	})
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Login successful"))
-}
-
-// GenerateToken 生成JWT Token
-type HertzJWTMiddleware struct {
-	Key     []byte
-	Timeout time.Duration
 }

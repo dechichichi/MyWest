@@ -63,11 +63,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// 发送 Token 给客户端
 	ctx := context.Background()                  // 获取 context
+	requestCtx := app.requestCtx(ctx, r)         // 获取请求上下文
 	statusCode := http.StatusOK                  // 设置状态码
 	message := "Login successful"                // 设置消息
 	expiration := time.Now().Add(24 * time.Hour) // 设置过期时间
 
-	requestCtx := app.NewRequestContext(r, w) // 获取请求上下文
 	authMiddleware.LoginResponse(ctx, requestCtx, statusCode, message, expiration)
 
 	if err != nil {
