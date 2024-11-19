@@ -22,8 +22,8 @@ func MyJwt() app.HandlerFunc {
 			return nil, nil
 		},
 		//设置登陆成功后为向 token 中添加自定义负载信息
-		PayloadFunc: func(data interface{}) JWT.MapClaims {
-			return JWT.MapClaims{}
+		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			return jwt.MapClaims{}
 		},
 		//获取身份信息
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
@@ -43,7 +43,7 @@ func MyJwt() app.HandlerFunc {
 	if err != nil {
 		panic(err)
 	}
-	return newmiddleware.MiddlewareFunc()
+	return newmiddleware
 }
 
 // KeyFunc 只在解析 token 时生效，签发 token 时不生效

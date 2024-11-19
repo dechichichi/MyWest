@@ -15,7 +15,8 @@ func CreateTask(c context.Context, ctx *app.RequestContext) {
 	var task model.Data
 	task.Title = ctx.Query("title")
 	task.Content = ctx.Query("content")
-
+	task.Status = ctx.Query("status")
+	task.UserID = ctx.Query("user_id")
 }
 
 func UpdateTask(c context.Context, ctx *app.RequestContext) {

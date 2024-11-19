@@ -2,8 +2,7 @@ package adminhandler
 
 import (
 	"context"
-	"todolist/model"
-
+	""todolist/model""
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -12,9 +11,8 @@ type Params struct {
 	Password string `json:"password"`
 }
 
-var User model.User
-
 func Login(c context.Context, ctx *app.RequestContext) {
+	var User model.User
 	name := ctx.Query("username")
 	pwd := ctx.Query("password")
 	err := check(name, pwd)

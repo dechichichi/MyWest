@@ -43,7 +43,7 @@ func MyJwt() app.HandlerFunc {
 	if err != nil {
 		panic(err)
 	}
-	return newmiddleware.MiddlewareFunc()
+	return newmiddleware
 }
 
 // KeyFunc 只在解析 token 时生效，签发 token 时不生效

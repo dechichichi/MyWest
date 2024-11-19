@@ -8,13 +8,10 @@ import (
 )
 
 func List(c context.Context, ctx *app.RequestContext) {
-
+	var tasks []model.Data
 }
 
 func CreateTask(c context.Context, ctx *app.RequestContext) {
-	var task model.Data
-	task.Title = ctx.Query("title")
-	task.Content = ctx.Query("content")
 
 }
 
