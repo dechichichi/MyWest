@@ -7,7 +7,6 @@ import (
 	"todolist/handler/userhandler"
 	"todolist/pkg/jwt"
 	"todolist/pkg/keyauth"
-	"todolist/pkg/log"
 	"todolist/pkg/sessions"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -23,8 +22,6 @@ func Router() {
 	h.Use(sessions.MySession())
 	h.Use(jwt.MyJwt())
 	h.Use(keyauth.MyKeyauth())
-	h.Use(log.Mylog())
-	h.Use(sessions.MySession())
 	memoryStore := persist.NewMemoryStore(1 * time.Minute)
 	h.Use(cache.NewCacheByRequestURI(memoryStore, 2*time.Second))
 	h1.Use(jwt.MyJwt())

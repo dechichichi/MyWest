@@ -24,7 +24,6 @@ func Router() {
 	h.Use(jwt.MyJwt())
 	h.Use(keyauth.MyKeyauth())
 	h.Use(log.Mylog())
-	h.Use(sessions.MySession())
 	memoryStore := persist.NewMemoryStore(1 * time.Minute)
 	h.Use(cache.NewCacheByRequestURI(memoryStore, 2*time.Second))
 	h1.Use(jwt.MyJwt())
