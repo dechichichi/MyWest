@@ -1,8 +1,10 @@
 package log
 
 import (
+	"context"
 	"time"
 
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/logger/accesslog"
@@ -20,6 +22,14 @@ func Mylog() app.HandlerFunc {
 		//配置时间戳的刷新间隔
 		accesslog.WithTimeInterval(time.Second),
 		//自定义日志打印函数
-		accesslog.WithAccessLogFunc(hlog.CtxInfof),
+		accesslog.WithAccessLogFunc(MyCtxInfof),
 	)
+}
+
+func MyCtxInfof(ctx context.Context, format string, v ...interface{}) {
+	logger.CtxInfof(ctx, format, v...)
+}
+
+type MyLoggger struct {
+	hlog.FullLogger
 }
