@@ -118,7 +118,7 @@ func GetTasksToKey(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	data, err := task.FindItem(user.ID, key)
+	data,err := task.FindItem(user.ID, key)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",

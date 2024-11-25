@@ -77,58 +77,24 @@ func DeleteTask(ctx context.Context, c *app.RequestContext) {
 func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
 	var user model.User
 	user.ID = c.Query("id")
-	way := c.Query("way")
-	var data []model.Data
-	var err error
-	if way == "done" {
-		data, err = task.GetCompletedItemList(user.ID)
-	} else if way == "todo" {
-		data, err = task.GetUncompletedItemList(user.ID)
-	} else if way == "all" {
-		data, err = task.GetAllItemList(user.ID)
-	} else {
-		c.JSON(http.StatusBadRequest, utils.H{
-			"message": "invalid way",
-			"code":    http.StatusBadRequest,
-		})
-		return
-	}
+	title := c.Query("title")
+	data, err := task.FindItemByTitle(user.ID, title)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
-		return
 	}
-	c.JSON(http.StatusOK, utils.H{
-		"message": "success",
-		"code":    http.StatusOK,
-		"data":    data,
-	})
+	way := c.Query("way")
+	if way == "done" {
+		task.GetCompletedItemList(user.ID)
+	} else if way == "todo" {
+		task.GetUncompletedItemList(user.ID)
+	} else if way == "all" {
+		task.GetAllItemList(user.ID)
+	}
 }
 
 func GetTasksToKey(ctx context.Context, c *app.RequestContext) {
-	var user model.User
-	user.ID = c.Query("id")
-	key := c.Query("key")
-	if len(key) == 0 {
-		c.JSON(http.StatusBadRequest, utils.H{
-			"message": "invalid key",
-			"code":    http.StatusBadRequest,
-		})
-		return
-	}
-	data, err := task.FindItem(user.ID, key)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, utils.H{
-			"message": "invalid data",
-			"code":    http.StatusBadRequest,
-		})
-		return
-	}
-	c.JSON(http.StatusOK, utils.H{
-		"message": "success",
-		"code":    http.StatusOK,
-		"data":    data,
-	})
+
 }
