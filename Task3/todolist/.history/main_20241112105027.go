@@ -1,5 +1,0 @@
-package todolist
-
-func main() {
-
-}
