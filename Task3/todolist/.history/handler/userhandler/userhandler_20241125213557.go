@@ -49,7 +49,7 @@ func Auth(ctx context.Context, c *app.RequestContext) {
 		"message": "success",
 		"code":    http.StatusOK,
 		"data": utils.H{
-			"username": user.UserName,
+			"username": user.Name,
 			"email":    user.Email,
 		},
 	})

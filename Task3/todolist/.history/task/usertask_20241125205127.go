@@ -100,15 +100,3 @@ func TAsk(username string, passward string) error {
 	// 返回user
 	return nil
 }
-
-func Auth(username string, password string) (*model.User, error) {
-	defer db.Close()
-	var user model.User
-	// 查询数据库
-	if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
-		return nil, err
-	}
-
-	// 返回user
-	return &user, nil
-}

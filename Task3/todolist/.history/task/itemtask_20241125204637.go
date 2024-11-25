@@ -8,7 +8,6 @@ import (
 
 // 创建任务
 func CreateItem(Id string, Data *model.Data) error {
-	defer db.Close()
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -28,7 +27,7 @@ func CreateItem(Id string, Data *model.Data) error {
 
 // 更新任务
 func UpdateItem(Id string, Data *model.Data, statues string) error {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -47,7 +46,7 @@ func UpdateItem(Id string, Data *model.Data, statues string) error {
 
 // 根据关键词查找任务
 func FindItem(Id string, key string) ([]model.Data, error) {
-	defer db.Close() //查找用户是否存在
+	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
 		return []model.Data{}, errors.New("username already exists")
@@ -62,7 +61,7 @@ func FindItem(Id string, key string) ([]model.Data, error) {
 
 // 获取已完成的任务列表
 func GetCompletedItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -78,7 +77,7 @@ func GetCompletedItemList(Id string) ([]model.Data, error) {
 
 // 获取未完成的任务列表
 func GetUncompletedItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -94,7 +93,7 @@ func GetUncompletedItemList(Id string) ([]model.Data, error) {
 
 // 获取全部任务列表
 func GetAllItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -110,7 +109,7 @@ func GetAllItemList(Id string) ([]model.Data, error) {
 
 // 删除任务
 func DeleteItem(Id string, Data *model.Data) error {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -125,7 +124,7 @@ func DeleteItem(Id string, Data *model.Data) error {
 
 // 精准查找任务
 func FindItemByTitle(Id string, title string) (model.Data, error) {
-	defer db.Close()
+
 	//查找用户是否存在
 	var user model.User
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
