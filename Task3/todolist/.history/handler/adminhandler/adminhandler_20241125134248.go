@@ -38,7 +38,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 			"code":    http.StatusBadRequest,
 		})
 	}
-	c.JSON(200, utils.H{
+	C.JSON(200, utils.H{
 		"message": "登录成功",
 		"code":    http.StatusOK,
 		"token":   tokenString,
@@ -46,10 +46,5 @@ func Login(ctx context.Context, c *app.RequestContext) {
 }
 
 func Logout(ctx context.Context, c *app.RequestContext) {
-	//清除token
-	JWT.JwtMiddleware.LogoutResponse(ctx, c, http.StatusOK)
-	c.JSON(200, utils.H{
-		"message": "退出成功",
-		"code":    http.StatusOK,
-	})
+
 }

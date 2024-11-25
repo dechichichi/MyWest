@@ -18,6 +18,7 @@ func Router() {
 	h1 := h.Group("/admin")
 	h2 := h.Group("/task")
 	//中间件
+	h.Use(jwt.MyJwt())
 	h.Use(accesslog.New())
 	memoryStore := persist.NewMemoryStore(1 * time.Minute)
 	h.Use(cache.NewCacheByRequestURI(memoryStore, 2*time.Second))

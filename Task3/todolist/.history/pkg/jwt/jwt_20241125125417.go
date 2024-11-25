@@ -20,12 +20,11 @@ type User struct {
 }
 
 var (
-	JwtMiddleware *jwt.HertzJWTMiddleware
-	IdentityKey   = "identity"
+	IdentityKey = "identity"
 )
 
 func MyJwt() app.HandlerFunc {
-	JwtMiddleware, err := jwt.New(&jwt.HertzJWTMiddleware{
+	authMiddleware, err := jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
 		Timeout:     time.Hour,
@@ -81,7 +80,7 @@ func MyJwt() app.HandlerFunc {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	return JwtMiddleware.MiddlewareFunc()
+	return authMiddleware.MiddlewareFunc()
 }
 
 // KeyFunc 只在解析 token 时生效，签发 token 时不生效

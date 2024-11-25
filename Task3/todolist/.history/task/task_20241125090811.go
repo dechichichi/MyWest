@@ -110,7 +110,7 @@ func Ask(username string) (*model.User, error) {
 	return &user, nil
 }
 
-func TAsk(username string, passward string) error {
+func Ask(username string, passward string) error {
 	db, err := gorm.Open(mysql.Open("root:Ly05985481282@/ginclass?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
 		return err

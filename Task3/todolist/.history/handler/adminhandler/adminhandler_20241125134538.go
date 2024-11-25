@@ -47,7 +47,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 
 func Logout(ctx context.Context, c *app.RequestContext) {
 	//清除token
-	JWT.JwtMiddleware.LogoutResponse(ctx, c, http.StatusOK)
+	JWT.JwtMiddleware.LogoutResponse(ctx, c)
 	c.JSON(200, utils.H{
 		"message": "退出成功",
 		"code":    http.StatusOK,

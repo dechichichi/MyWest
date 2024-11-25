@@ -15,11 +15,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	email := c.Query("email")
 	_, err := task.Ask(name)
 	if err != nil {
-		c.JSON(http.StatusOK, utils.H{
-			"message": "user already exists",
-			"code":    http.StatusBadRequest,
-		})
-		return
+		panic(err)
 	}
 	_, err = task.Add(name, passward, email)
 	if err != nil {

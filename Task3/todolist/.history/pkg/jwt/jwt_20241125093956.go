@@ -19,22 +19,19 @@ type User struct {
 	LastName  string
 }
 
-var (
-	JwtMiddleware *jwt.HertzJWTMiddleware
-	IdentityKey   = "identity"
-)
+var identityKey = "id"
 
 func MyJwt() app.HandlerFunc {
-	JwtMiddleware, err := jwt.New(&jwt.HertzJWTMiddleware{
+	authMiddleware, err := jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
-		IdentityKey: IdentityKey,
+		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					IdentityKey: v.UserName,
+					identityKey: v.UserName,
 				}
 			}
 			return jwt.MapClaims{}
@@ -42,7 +39,7 @@ func MyJwt() app.HandlerFunc {
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
 			return &User{
-				UserName: claims[IdentityKey].(string),
+				UserName: claims[identityKey].(string),
 			}
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
@@ -81,7 +78,7 @@ func MyJwt() app.HandlerFunc {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	return JwtMiddleware.MiddlewareFunc()
+	return authMiddleware.MiddlewareFunc()
 }
 
 // KeyFunc 只在解析 token 时生效，签发 token 时不生效
