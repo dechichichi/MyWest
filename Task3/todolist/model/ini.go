@@ -3,7 +3,8 @@ package model
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 // Data 嵌套结构体，包含文章相关数据
@@ -14,8 +15,8 @@ type Data struct {
 	Views     int
 	Status    int
 	CreatedAt time.Time
-	StartTime time.Time
-	EndTime   time.Time
+	StartTime time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	EndTime   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
 
 // User 用户模型，包含用户信息和文章数据
@@ -28,14 +29,17 @@ type User struct {
 }
 
 func UserInit(consstring string) {
-	db, err := gorm.Open("mysql", consstring)
+	dsn := consstring
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-	db.SingularTable(true)
-	db.DB().SetMaxIdleConns(20)
-	db.DB().SetMaxOpenConns(100)
-	db.DB().SetConnMaxLifetime(time.Second * 30)
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
 	db.AutoMigrate(&User{})
+	sqlDB.SetMaxIdleConns(20)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Second * 30)
 }

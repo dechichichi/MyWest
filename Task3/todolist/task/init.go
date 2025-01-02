@@ -1,15 +1,17 @@
 package task
 
 import (
-	"github.com/jinzhu/gorm"
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
 )
 
 var db *gorm.DB
-var err error
 
-func Init() {
-	db, err = gorm.Open("mysql", "root:Ly05985481282@/ginclass?charset=utf8mb4&parseTime=True&loc=Local")
-	if err != nil {
-		panic(err)
-	}
+func Init(dsn string) (*gorm.DB, error) {
+    var err error
+    db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil {
+        return nil, err
+    }
+    return db, nil
 }

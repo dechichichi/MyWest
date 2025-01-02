@@ -6,13 +6,21 @@ import (
 	"todolist/model"
 )
 
+var user model.User
+
+func FindUser(Id string) error {
+	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
+		return errors.New("username does not exist")
+	}
+	return nil
+}
+
 // 创建任务
 func CreateItem(Id string, Data *model.Data) error {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找是否存在相同标题的任务
 	var item model.Data
@@ -28,11 +36,10 @@ func CreateItem(Id string, Data *model.Data) error {
 
 // 更新任务
 func UpdateItem(Id string, Data *model.Data, statues string) error {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//更新任务
 	statuesInt, err := strconv.Atoi(statues)
@@ -47,10 +54,10 @@ func UpdateItem(Id string, Data *model.Data, statues string) error {
 
 // 根据关键词查找任务
 func FindItem(Id string, key string) ([]model.Data, error) {
-	defer db.Close() //查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return []model.Data{}, errors.New("username already exists")
+	//查找用户是否存在
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找任务
 	var items []model.Data
@@ -62,11 +69,10 @@ func FindItem(Id string, key string) ([]model.Data, error) {
 
 // 获取已完成的任务列表
 func GetCompletedItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return []model.Data{}, errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找任务
 	var items []model.Data
@@ -78,11 +84,10 @@ func GetCompletedItemList(Id string) ([]model.Data, error) {
 
 // 获取未完成的任务列表
 func GetUncompletedItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return []model.Data{}, errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找任务
 	var items []model.Data
@@ -94,11 +99,10 @@ func GetUncompletedItemList(Id string) ([]model.Data, error) {
 
 // 获取全部任务列表
 func GetAllItemList(Id string) ([]model.Data, error) {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return []model.Data{}, errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找任务
 	var items []model.Data
@@ -110,11 +114,10 @@ func GetAllItemList(Id string) ([]model.Data, error) {
 
 // 删除任务
 func DeleteItem(Id string, Data *model.Data) error {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//删除任务
 	if err := db.Delete(&Data).Error; err != nil {
@@ -125,11 +128,10 @@ func DeleteItem(Id string, Data *model.Data) error {
 
 // 精准查找任务
 func FindItemByTitle(Id string, title string) (model.Data, error) {
-	defer db.Close()
 	//查找用户是否存在
-	var user model.User
-	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
-		return model.Data{}, errors.New("username already exists")
+	err := FindUser(Id)
+	if err != nil {
+		panic(err)
 	}
 	//查找任务
 	var item model.Data
