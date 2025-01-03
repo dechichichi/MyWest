@@ -2,7 +2,6 @@ package routes
 
 import (
 	"time"
-	"todolist/handler/adminhandler"
 	"todolist/handler/taskhandler"
 	"todolist/handler/userhandler"
 	"todolist/middleware/jwt"
@@ -13,7 +12,7 @@ import (
 	"github.com/hertz-contrib/logger/accesslog"
 )
 
-func Router()*server.Hertz {
+func Router() *server.Hertz {
 	//web服务地址在localhost:8080
 	h := server.New(server.WithHostPorts(":8080"))
 	// 中间件
@@ -29,7 +28,7 @@ func Router()*server.Hertz {
 	// 用户注册和登录不需要JWT保护
 	h1 := h.Group("/user")
 	h1.POST("register", userhandler.Register)
-	h1.POST("login", adminhandler.Login)
+	h1.POST("login", userhandler.Login)
 	// 需要JWT保护的路由
 	auth := h1.Group("auth")
 	auth.Use(jwt.MyJwt())
