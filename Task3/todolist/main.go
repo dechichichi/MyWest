@@ -9,14 +9,16 @@ import (
 
 func main() {
 	// 初始化配置
-	config.Init()
+	cfg, err := config.Init()
+	if err != nil {
+		log.Fatalf("Failed to initialize config: %v", err)
+	}
 
 	// 初始化数据库连接
-	db, err := task.Init(config.Dsn)
+	db, err := task.Init(cfg.DSN())
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-
 	// 获取数据库实例
 	sqlDB, err := db.DB()
 	if err != nil {
