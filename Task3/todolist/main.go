@@ -9,13 +9,10 @@ import (
 
 func main() {
 	// 初始化配置
-	cfg, err := config.Init()
-	if err != nil {
-		log.Fatalf("Failed to initialize config: %v", err)
-	}
+	config.LoadConfig()
 
 	// 初始化数据库连接
-	db, err := task.Init(cfg.DSN())
+	db, err := task.Init(config.DSN)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}

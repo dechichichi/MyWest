@@ -2,9 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 // Data 嵌套结构体，包含文章相关数据
@@ -26,20 +23,4 @@ type User struct {
 	Password string `gorm:"type:varchar(50)"`
 	Data     Data   `gorm:"embedded"`
 	Email    string `gorm:"type:varchar(50);uniqueIndex"`
-}
-
-func UserInit(consstring string) {
-	dsn := consstring
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-	db.AutoMigrate(&User{})
-	sqlDB.SetMaxIdleConns(20)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Second * 30)
 }

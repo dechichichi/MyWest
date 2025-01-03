@@ -25,14 +25,16 @@ type Config struct {
 	Service ServiceData
 }
 
-func LoadConfig() (*Config, error) {
+var DSN string
+
+func LoadConfig() {
 	viper.SetConfigName("config.yml")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./")
 	err := viper.ReadInConfig() //读取配置
 	if err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return 
 	}
 
 	config := &Config{}
@@ -40,27 +42,15 @@ func LoadConfig() (*Config, error) {
 	err = configDB.Unmarshal(&config.DB)
 	if err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return 
 	}
 	configService := viper.Sub("service")
 	err = configService.Unmarshal(&config.Service)
 	if err != nil {
 		log.Fatalln(err)
-		return nil, err
+		return 
 	}
-
-	return config, nil
+	DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.DB.Dbuser, config.DB.Dbpassword, config.DB.Dbhost, config.DB.Dbport, config.DB.Dbdatabase)
 }
 
-func (c *Config) DSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		c.DB.Dbuser, c.DB.Dbpassword, c.DB.Dbhost, c.DB.Dbport, c.DB.Dbdatabase)
-}
-
-func Init() (*Config, error) {
-	config, err := LoadConfig()
-	if err != nil {
-		return nil, err
-	}
-	return config, nil
-}
