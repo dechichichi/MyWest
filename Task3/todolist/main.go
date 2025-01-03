@@ -12,7 +12,7 @@ func main() {
 	config.LoadConfig()
 
 	// 初始化数据库连接
-	db, err := task.Init(config.DSN)
+	db, err := task.Init()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}

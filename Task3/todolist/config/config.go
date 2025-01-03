@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -25,7 +24,7 @@ type Config struct {
 	Service ServiceData
 }
 
-var DSN string
+var ConfigData *Config
 
 func LoadConfig() {
 	viper.SetConfigName("config.yml")
@@ -34,23 +33,18 @@ func LoadConfig() {
 	err := viper.ReadInConfig() //读取配置
 	if err != nil {
 		log.Fatalln(err)
-		return 
+		return
 	}
-
-	config := &Config{}
 	configDB := viper.Sub("mysql")
-	err = configDB.Unmarshal(&config.DB)
+	err = configDB.Unmarshal(&ConfigData.DB)
 	if err != nil {
 		log.Fatalln(err)
-		return 
+		return
 	}
 	configService := viper.Sub("service")
-	err = configService.Unmarshal(&config.Service)
+	err = configService.Unmarshal(&ConfigData.Service)
 	if err != nil {
 		log.Fatalln(err)
-		return 
+		return
 	}
-	DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.DB.Dbuser, config.DB.Dbpassword, config.DB.Dbhost, config.DB.Dbport, config.DB.Dbdatabase)
 }
-

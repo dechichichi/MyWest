@@ -1,15 +1,18 @@
 package task
 
 import (
+	"fmt"
 	"time"
+	"todolist/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var db *gorm.DB
+var dsn string
 
-func Init(dsn string) (*gorm.DB, error) {
+func Init() (*gorm.DB, error) {
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -28,4 +31,9 @@ func Init(dsn string) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(time.Hour) // 设置连接的最大生存时间
 
 	return db, nil
+}
+
+func GwtDSN() {
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		config.ConfigData.DB.Dbuser, config.ConfigData.DB.Dbpassword, config.ConfigData.DB.Dbhost, config.ConfigData.DB.Dbport, config.ConfigData.DB.Dbdatabase)
 }
