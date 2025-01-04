@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"todolist/model"
-	"todolist/task"
+	"todolist/database"
+	"todolist/service"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 )
 
 func List(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	user.ID = c.PostForm("id")
-	data, err := task.GetAllItemList(user.ID)
+	data, err := service.GetAllItemList(user.ID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",
@@ -29,9 +29,9 @@ func List(ctx context.Context, c *app.RequestContext) {
 }
 
 func CreateTask(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	user.ID = c.PostForm("id")
-	var data model.Data
+	var data database.Data
 	err := json.Unmarshal([]byte(c.PostForm("data")), &data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
@@ -39,7 +39,7 @@ func CreateTask(ctx context.Context, c *app.RequestContext) {
 			"code":    http.StatusBadRequest,
 		})
 	}
-	task.CreateItem(user.ID, &data)
+	service.CreateItem(user.ID, &data)
 	c.JSON(http.StatusOK, utils.H{
 		"message": "success",
 		"code":    http.StatusOK,
@@ -47,11 +47,11 @@ func CreateTask(ctx context.Context, c *app.RequestContext) {
 }
 
 func UpdateTask(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	user.ID = c.PostForm("id")
-	var data model.Data
+	var data database.Data
 	title := c.PostForm("title")
-	data, err := task.FindItemByTitle(user.ID, title)
+	data, err := service.FindItemByTitle(user.ID, title)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",
@@ -65,22 +65,22 @@ func UpdateTask(ctx context.Context, c *app.RequestContext) {
 			"code":    http.StatusBadRequest,
 		})
 	}
-	task.UpdateItem(user.ID, &data, newstatues)
+	service.UpdateItem(user.ID, &data, newstatues)
 }
 
 func DeleteTask(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	var title string
 	user.ID = c.PostForm("id")
 	title = c.PostForm("title")
-	data, err := task.FindItemByTitle(user.ID, title)
+	data, err := service.FindItemByTitle(user.ID, title)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
 	}
-	task.DeleteItem(user.ID, &data)
+	service.DeleteItem(user.ID, &data)
 	c.JSON(http.StatusOK, utils.H{
 		"message": "success",
 		"code":    http.StatusOK,
@@ -88,17 +88,17 @@ func DeleteTask(ctx context.Context, c *app.RequestContext) {
 }
 
 func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	user.ID = c.PostForm("id")
 	way := c.PostForm("way")
-	var data []model.Data
+	var data []database.Data
 	var err error
 	if way == "done" {
-		data, err = task.GetCompletedItemList(user.ID)
+		data, err = service.GetCompletedItemList(user.ID)
 	} else if way == "todo" {
-		data, err = task.GetUncompletedItemList(user.ID)
+		data, err = service.GetUncompletedItemList(user.ID)
 	} else if way == "all" {
-		data, err = task.GetAllItemList(user.ID)
+		data, err = service.GetAllItemList(user.ID)
 	} else {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid way",
@@ -121,7 +121,7 @@ func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
 }
 
 func GetTasksByKey(ctx context.Context, c *app.RequestContext) {
-	var user model.User
+	var user database.User
 	user.ID = c.PostForm("id")
 	key := c.PostForm("key")
 	if len(key) == 0 {
@@ -131,7 +131,7 @@ func GetTasksByKey(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	data, err := task.FindItem(user.ID, key)
+	data, err := service.FindItem(user.ID, key)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",

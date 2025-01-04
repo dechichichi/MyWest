@@ -1,17 +1,17 @@
-package task
+package service
 
 import (
 	"errors"
 	"fmt"
-	"todolist/model"
+	"todolist/database"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 )
 
 // VerifyUser 验证用户名和密码，并返回用户信息
-func VerifyUser(username string, password string) (*model.User, error) {
-	var user model.User
+func VerifyUser(username string, password string) (*database.User, error) {
+	var user database.User
 	// 查询数据库，根据用户名查找用户
 	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
 		// 如果没有找到用户，返回错误
@@ -30,14 +30,14 @@ func VerifyUser(username string, password string) (*model.User, error) {
 }
 
 // Add 添加用户
-func Add(username string, password string, email string) (*model.User, error) {
-	var user model.User
+func Add(username string, password string, email string) (*database.User, error) {
+	var user database.User
 	if err := db.Where("username = ?", username).First(&user).Error; err == nil {
 		return nil, errors.New("username already exists")
 	}
 
 	// 添加用户
-	newUser := model.User{ID: username, Password: password, Email: email}
+	newUser := database.User{ID: username, Password: password, Email: email}
 	if err := db.Create(&newUser).Error; err != nil {
 		return nil, err
 	}
@@ -47,14 +47,14 @@ func Add(username string, password string, email string) (*model.User, error) {
 
 // Delete 删除用户
 func Delete(username string, password string) error {
-    // 验证用户名和密码
-	var user model.User
+	// 验证用户名和密码
+	var user database.User
 	if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
 		return err
 	}
 
 	// 删除用户
-	if err := db.Delete(&model.User{}, "username = ?", username).Error; err != nil {
+	if err := db.Delete(&database.User{}, "username = ?", username).Error; err != nil {
 		return err
 	}
 
@@ -62,9 +62,9 @@ func Delete(username string, password string) error {
 }
 
 // ModifyName 修改用户名
-func ModifyName(username string, password string, newname string) (*model.User, error) {
+func ModifyName(username string, password string, newname string) (*database.User, error) {
 	// 验证用户名和密码
-	var user model.User
+	var user database.User
 	if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -78,9 +78,9 @@ func ModifyName(username string, password string, newname string) (*model.User, 
 }
 
 // ModifyPassword 修改密码
-func ModifyPassword(username string, password string, newpassword string) (*model.User, error) {
+func ModifyPassword(username string, password string, newpassword string) (*database.User, error) {
 	// 验证用户名和密码
-	var user model.User
+	var user database.User
 	if err := db.Where("username = ? AND password = ?", username, password).First(&user).Error; err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func ModifyPassword(username string, password string, newpassword string) (*mode
 }
 
 // Ask 查询用户
-func Ask(username string) (*model.User, error) {
+func Ask(username string) (*database.User, error) {
 	// 查询数据库
 	if err := db.Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
@@ -109,6 +109,6 @@ func TAsk(username string, password string) error {
 	return err
 }
 
-func Auth(username string, password string) (*model.User, error) {
+func Auth(username string, password string) (*database.User, error) {
 	return VerifyUser(username, password)
 }

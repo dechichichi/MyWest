@@ -1,12 +1,12 @@
-package task
+package service
 
 import (
 	"errors"
 	"strconv"
-	"todolist/model"
+	"todolist/database"
 )
 
-var user model.User
+var user database.User
 
 func FindUser(Id string) error {
 	if err := db.Where("id = ?", Id).First(&user).Error; err == nil {
@@ -16,14 +16,14 @@ func FindUser(Id string) error {
 }
 
 // 创建任务
-func CreateItem(Id string, Data *model.Data) error {
+func CreateItem(Id string, Data *database.Data) error {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找是否存在相同标题的任务
-	var item model.Data
+	var item database.Data
 	if err := db.Where("title = ?", Data.Title).First(&item).Error; err == nil {
 		return errors.New("task already exists")
 	}
@@ -35,7 +35,7 @@ func CreateItem(Id string, Data *model.Data) error {
 }
 
 // 更新任务
-func UpdateItem(Id string, Data *model.Data, statues string) error {
+func UpdateItem(Id string, Data *database.Data, statues string) error {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
@@ -46,21 +46,21 @@ func UpdateItem(Id string, Data *model.Data, statues string) error {
 	if err != nil {
 		return err // 处理转换错误
 	}
-	if err := db.Model(&Data).Updates(model.Data{Status: statuesInt}).Error; err != nil {
+	if err := db.Model(&Data).Updates(database.Data{Status: statuesInt}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 // 根据关键词查找任务
-func FindItem(Id string, key string) ([]model.Data, error) {
+func FindItem(Id string, key string) ([]database.Data, error) {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找任务
-	var items []model.Data
+	var items []database.Data
 	if err := db.Where("title LIKE ?", "%"+key+"%").Find(&items).Error; err != nil {
 		return nil, err
 	}
@@ -68,14 +68,14 @@ func FindItem(Id string, key string) ([]model.Data, error) {
 }
 
 // 获取已完成的任务列表
-func GetCompletedItemList(Id string) ([]model.Data, error) {
+func GetCompletedItemList(Id string) ([]database.Data, error) {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找任务
-	var items []model.Data
+	var items []database.Data
 	if err := db.Where("status = ?", 1).Find(&items).Error; err != nil {
 		return nil, err
 	}
@@ -83,14 +83,14 @@ func GetCompletedItemList(Id string) ([]model.Data, error) {
 }
 
 // 获取未完成的任务列表
-func GetUncompletedItemList(Id string) ([]model.Data, error) {
+func GetUncompletedItemList(Id string) ([]database.Data, error) {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找任务
-	var items []model.Data
+	var items []database.Data
 	if err := db.Where("status = ?", 0).Find(&items).Error; err != nil {
 		return nil, err
 	}
@@ -98,14 +98,14 @@ func GetUncompletedItemList(Id string) ([]model.Data, error) {
 }
 
 // 获取全部任务列表
-func GetAllItemList(Id string) ([]model.Data, error) {
+func GetAllItemList(Id string) ([]database.Data, error) {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找任务
-	var items []model.Data
+	var items []database.Data
 	if err := db.Find(&items).Error; err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func GetAllItemList(Id string) ([]model.Data, error) {
 }
 
 // 删除任务
-func DeleteItem(Id string, Data *model.Data) error {
+func DeleteItem(Id string, Data *database.Data) error {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
@@ -127,16 +127,16 @@ func DeleteItem(Id string, Data *model.Data) error {
 }
 
 // 精准查找任务
-func FindItemByTitle(Id string, title string) (model.Data, error) {
+func FindItemByTitle(Id string, title string) (database.Data, error) {
 	//查找用户是否存在
 	err := FindUser(Id)
 	if err != nil {
 		panic(err)
 	}
 	//查找任务
-	var item model.Data
+	var item database.Data
 	if err := db.Where("title = ?", title).First(&item).Error; err != nil {
-		return model.Data{}, err
+		return database.Data{}, err
 	}
 	return item, nil
 }

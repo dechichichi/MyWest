@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"todolist/database"
 	JWT "todolist/middleware/jwt"
-	"todolist/model"
 	myutils "todolist/pkg"
-	"todolist/task"
+	"todolist/service"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
@@ -17,14 +17,14 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	name := c.Query("username")
 	password := c.Query("password")
 	email := c.Query("email")
-	if _, err := task.Ask(name); err == nil {
+	if _, err := service.Ask(name); err == nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "user already exists",
 			"code":    http.StatusBadRequest,
 		})
 		return
 	}
-	if _, err := task.Add(name, password, email); err != nil {
+	if _, err := service.Add(name, password, email); err != nil {
 		c.JSON(http.StatusInternalServerError, utils.H{
 			"message": err.Error(),
 			"code":    http.StatusInternalServerError,
@@ -40,7 +40,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 func Auth(ctx context.Context, c *app.RequestContext) {
 	name := c.Query("username")
 	password := c.Query("password")
-	if user, err := task.Auth(name, password); err != nil {
+	if user, err := service.Auth(name, password); err != nil {
 		c.JSON(http.StatusUnauthorized, utils.H{
 			"message": err.Error(),
 			"code":    http.StatusUnauthorized,
@@ -86,7 +86,7 @@ func Ping(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	c.JSON(http.StatusOK, utils.H{
-		"message": fmt.Sprintf("username:%v", user.(*model.User).UserName),
+		"message": fmt.Sprintf("username:%v", user.(*database.User).UserName),
 	})
 }
 
@@ -94,7 +94,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	name := c.Query("username")
 	pwd := c.Query("password")
 	// 验证用户名密码
-	err := task.TAsk(name, pwd)
+	err := service.TAsk(name, pwd)
 	if err != nil {
 		c.JSON(200, utils.H{
 			"message": "用户名或密码错误",
