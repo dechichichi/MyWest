@@ -13,6 +13,7 @@ var db *gorm.DB
 var dsn string
 
 func Init() (*gorm.DB, error) {
+	GetDSN()
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -33,7 +34,7 @@ func Init() (*gorm.DB, error) {
 	return db, nil
 }
 
-func GwtDSN() {
+func GetDSN() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		config.ConfigData.DB.Dbuser, config.ConfigData.DB.Dbpassword, config.ConfigData.DB.Dbhost, config.ConfigData.DB.Dbport, config.ConfigData.DB.Dbdatabase)
 }

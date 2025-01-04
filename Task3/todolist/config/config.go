@@ -27,14 +27,15 @@ type Config struct {
 var ConfigData *Config
 
 func LoadConfig() {
-	viper.SetConfigName("config.yml")
+	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./")
+	viper.AddConfigPath("config/")
 	err := viper.ReadInConfig() //读取配置
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
+	ConfigData = &Config{}
 	configDB := viper.Sub("mysql")
 	err = configDB.Unmarshal(&ConfigData.DB)
 	if err != nil {
