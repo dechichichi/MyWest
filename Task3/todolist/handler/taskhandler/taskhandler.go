@@ -120,7 +120,7 @@ func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
 	})
 }
 
-func GetTasksToKey(ctx context.Context, c *app.RequestContext) {
+func GetTasksByKey(ctx context.Context, c *app.RequestContext) {
 	var user model.User
 	user.ID = c.Query("id")
 	key := c.Query("key")

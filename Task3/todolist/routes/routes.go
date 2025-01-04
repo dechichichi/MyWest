@@ -37,7 +37,7 @@ func Router() *server.Hertz {
 		auth.POST("/:id/task/create", taskhandler.CreateTask)
 		auth.GET("/:id/task/:tid", taskhandler.List)
 		auth.POST("/:id/tasks", taskhandler.GetTasksToDone)
-		auth.POST("/:id/task/search", taskhandler.GetTasksToKey)
+		auth.POST("/:id/task/search", taskhandler.GetTasksByKey)
 		auth.PUT("/:id/task/:tid", taskhandler.UpdateTask)
 		auth.DELETE("/:id/task/:tid", taskhandler.DeleteTask)
 	}
