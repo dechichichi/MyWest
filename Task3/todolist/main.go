@@ -4,7 +4,7 @@ import (
 	"log"
 	"todolist/config"
 	"todolist/routes"
-	"todolist/task"
+	"todolist/service"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 	config.LoadConfig()
 
 	// 初始化数据库连接
-	db, err := task.Init()
+	db, err := service.Init()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}

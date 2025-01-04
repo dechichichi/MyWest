@@ -13,6 +13,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/utils"
 )
 
+
+
 func Register(ctx context.Context, c *app.RequestContext) {
 	name := c.Query("username")
 	password := c.Query("password")

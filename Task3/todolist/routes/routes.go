@@ -27,19 +27,20 @@ func Router() *server.Hertz {
 	// 注册API
 	// 用户注册和登录不需要JWT保护
 	h1 := h.Group("/user")
-	h1.POST("register", userhandler.Register)
-	h1.POST("login", userhandler.Login)
+	h1.POST("/register", userhandler.Register)
+	h1.POST("/login", userhandler.Login)
 	// 需要JWT保护的路由
 	auth := h1.Group("auth")
 	auth.Use(jwt.MyJwt())
 	{
 		auth.GET("/:id", userhandler.Auth)
-		auth.POST("/:id/task/create", taskhandler.CreateTask)
-		auth.GET("/:id/task/:tid", taskhandler.List)
-		auth.POST("/:id/tasks", taskhandler.GetTasksToDone)
-		auth.POST("/:id/task/search", taskhandler.GetTasksByKey)
-		auth.PUT("/:id/task/:tid", taskhandler.UpdateTask)
-		auth.DELETE("/:id/task/:tid", taskhandler.DeleteTask)
+		task := auth.Group("/:id/task")
+		task.GET("", taskhandler.List)
+		task.POST("/todo", taskhandler.GetTasksToDone)
+		task.POST("/create", taskhandler.CreateTask)
+		task.DELETE("/delete", taskhandler.DeleteTask)
+		task.POST("/search", taskhandler.GetTasksByKey)
+		task.PUT("/update", taskhandler.UpdateTask)
 	}
 	// 启动服务
 	//在接受到关闭请求后,等待所有请求处理完毕，再关闭服务
