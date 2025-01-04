@@ -13,7 +13,7 @@ import (
 
 func List(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
+	user.ID = c.PostForm("id")
 	data, err := task.GetAllItemList(user.ID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
@@ -30,9 +30,9 @@ func List(ctx context.Context, c *app.RequestContext) {
 
 func CreateTask(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
+	user.ID = c.PostForm("id")
 	var data model.Data
-	err := json.Unmarshal([]byte(c.Query("data")), &data)
+	err := json.Unmarshal([]byte(c.PostForm("data")), &data)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid data",
@@ -48,9 +48,9 @@ func CreateTask(ctx context.Context, c *app.RequestContext) {
 
 func UpdateTask(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
+	user.ID = c.PostForm("id")
 	var data model.Data
-	title := c.Query("title")
+	title := c.PostForm("title")
 	data, err := task.FindItemByTitle(user.ID, title)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
@@ -58,7 +58,7 @@ func UpdateTask(ctx context.Context, c *app.RequestContext) {
 			"code":    http.StatusBadRequest,
 		})
 	}
-	newstatues := c.Query("status")
+	newstatues := c.PostForm("status")
 	if len(newstatues) == 0 {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid status",
@@ -70,9 +70,9 @@ func UpdateTask(ctx context.Context, c *app.RequestContext) {
 
 func DeleteTask(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
 	var title string
-	title = c.Query("title")
+	user.ID = c.PostForm("id")
+	title = c.PostForm("title")
 	data, err := task.FindItemByTitle(user.ID, title)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.H{
@@ -89,8 +89,8 @@ func DeleteTask(ctx context.Context, c *app.RequestContext) {
 
 func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
-	way := c.Query("way")
+	user.ID = c.PostForm("id")
+	way := c.PostForm("way")
 	var data []model.Data
 	var err error
 	if way == "done" {
@@ -122,8 +122,8 @@ func GetTasksToDone(ctx context.Context, c *app.RequestContext) {
 
 func GetTasksByKey(ctx context.Context, c *app.RequestContext) {
 	var user model.User
-	user.ID = c.Query("id")
-	key := c.Query("key")
+	user.ID = c.PostForm("id")
+	key := c.PostForm("key")
 	if len(key) == 0 {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "invalid key",
