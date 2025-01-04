@@ -6,6 +6,7 @@ import (
 	"net/http"
 	JWT "todolist/middleware/jwt"
 	"todolist/model"
+	myutils "todolist/pkg"
 	"todolist/task"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -46,7 +47,7 @@ func Auth(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	} else {
-		token, claims, err := JWT.JwtMiddleware.TokenGenerator(name)
+		token, claims, err := myutils.GenerateToken(name)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, utils.H{
 				"message": "token generation failed",
@@ -103,7 +104,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	}
 	// 验证成功就登录成功
 	// 接下来生成 token 返回给前端
-	token, _, err := JWT.JwtMiddleware.TokenGenerator(name)
+	token, _, err := myutils.GenerateToken(name)
 	if err != nil {
 		c.JSON(200, utils.H{
 			"message": "登录失败",
@@ -111,7 +112,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-	claims, _ := JWT.JwtMiddleware.GetClaimsFromJWT(ctx, c)
+	claims, _ := myutils.GetClaimsFromJWT(ctx, c)
 	c.JSON(http.StatusOK, utils.H{
 		"message": "登录成功",
 		"code":    http.StatusOK,
@@ -121,7 +122,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 }
 func Logout(ctx context.Context, c *app.RequestContext) {
 	// 验证token的有效性
-	_, err := JWT.JwtMiddleware.ParseToken(ctx, c)
+	_, err := myutils.ParseToken(ctx, c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, utils.H{
 			"message": "无效的token",
@@ -130,7 +131,7 @@ func Logout(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	// 清除token
-	JWT.JwtMiddleware.LogoutResponse(ctx, c, http.StatusOK)
+	myutils.LogoutResponse(ctx, c, http.StatusOK)
 	c.JSON(http.StatusOK, utils.H{
 		"message": "退出成功",
 		"code":    http.StatusOK,
