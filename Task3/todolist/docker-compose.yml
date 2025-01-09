@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  todolist:
+    image: mywest/todolist:latest
+    ports:
+      - "8080:8080"
+    container_name: todolist

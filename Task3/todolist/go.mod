@@ -1,6 +1,6 @@
 module todolist
 
-go 1.23.0
+go 1.23
 
 require (
 	github.com/cloudwego/hertz v0.9.4
