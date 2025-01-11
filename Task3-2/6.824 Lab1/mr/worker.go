@@ -10,7 +10,6 @@ import (
 	"os"
 	"sort"
 	"strconv"
-	"time"
 )
 
 // for sorting by key.
@@ -100,24 +99,18 @@ func Worker(mapf func(string, string) []KeyValue,
 				DoMapTask(mapf, &task)
 				callDone()
 			}
-		case WaittingTask:
-			{
-				fmt.Println("Waitting.......")
-				time.Sleep(1 * time.Second)
-			}
-		case ExitTask:
-			{
-				fmt.Println("Exit.......")
-				keepFlag = false
-			}
 		case ReduceTask:
 			{
 				DoReduceTask(reducef, &task)
 				callDone()
 			}
+		case Done:
+			{
+				keepFlag = false
+				fmt.Println("AllDone")
+			}
 		}
 	}
-
 	return true
 }
 

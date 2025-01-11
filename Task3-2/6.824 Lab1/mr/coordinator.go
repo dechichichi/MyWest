@@ -7,11 +7,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
-	"strconv"
-	"strings"
 	"sync"
-	"time"
-	"unicode"
 )
 
 //call 函数通过1234端口传入args和reply的内存地址，调用rpcname（Coordinator.函数名），
@@ -24,25 +20,9 @@ import (
 
 type Coordinator struct {
 	// Your definitions here.
-	ReduceNum int
-	Task      Task
-	DistPhase Phase
-	Mutex     sync.Mutex // 锁
-}
-
-func (c *Coordinator) handler(files string, nReduce int) error {
-	//任务分配
-	c.Task.Filename = files
-	c.Task.ReducerNum = nReduce
-	Worker(mapf, reducef)
-	//状态监控
-	for callDone() == false {
-		time.Sleep(100 * time.Millisecond)
-	}
-	//结果收集
-	c.DistPhase = AllDone
-	//异常处理
-	return nil
+	Tasks []Task
+	State State
+	Mutex sync.Mutex // 锁
 }
 
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
@@ -61,35 +41,22 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	return &c
 }
 
-// Done
+func (c *Coordinator) handler(files string, nReduce int) error {
+	//任务分配
+	c.Tasks = append(c.Tasks, Task{files: files,TaskType: MapTask, Filename: files, TaskID: nReduce})
+	c.State = Waiting
+	return nil
+}
+
 func (c *Coordinator) Done() bool {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
-	if c.DistPhase == AllDone {
+	if c.State == AllDone {
 		fmt.Printf("All workers done\n")
 		return true // 应该返回true，表示所有工作都已完成
 	} else {
 		return false
 	}
-}
-
-func mapf(filename string, contents string) []KeyValue {
-	// function to detect word separators.
-	ff := func(r rune) bool { return !unicode.IsLetter(r) }
-
-	// split contents into an array of words.
-	words := strings.FieldsFunc(contents, ff)
-
-	kva := []KeyValue{}
-	for _, w := range words {
-		kv := KeyValue{w, "1"}
-		kva = append(kva, kv)
-	}
-	return kva
-}
-
-func reducef(key string, values []string) string {
-	return strconv.Itoa(len(values))
 }
 
 // start a thread that listens for RPCs from worker.go

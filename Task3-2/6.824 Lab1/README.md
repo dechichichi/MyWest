@@ -12,3 +12,5 @@ wc.so：这是一个动态链接库（在Unix系统中，共享库文件通常�
 pg*.txt：这是一个文件匹配模式，表示所有以pg开头并以.txt结尾的文本文件。这些文件将作为MapReduce作业的输入数据。在MapReduce框架中，这些文件通常被分割成多个chunk，每个chunk作为一个Map任务的输入。
 
 综上所述，整个命令的意思是：运行main.go程序，加载wc.so插件来处理所有匹配pg*.txt模式的文本文件，执行Word Count MapReduce作业。
+
+wc.go  文本索引器
