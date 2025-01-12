@@ -10,60 +10,47 @@ import (
 	"sync"
 )
 
-//call 函数通过1234端口传入args和reply的内存地址，调用rpcname（Coordinator.函数名），
-//通过反射机制"远程"调用Coordinator的该函数，Coordinator通过内存地址读取入参写出结果。
-//worker.go里面的Worker方法调用CallExample，先运行Coordinator，再运行worker，
-//看看worker端打印返回来的经过Coordinator加工过的数字
-
-//Master节点的RPC服务端，负责分配任务给worker节点，并监控worker节点的状态，当所有worker节点完成任务后，Master节点会汇总结果并返回给客户端。
-//MapReduce的基本思路是启动一个coordinator分配多个worker做map任务
-
 type Coordinator struct {
-	// Your definitions here.
-	Tasks []Task
-	State State
-	Mutex sync.Mutex // 锁
+	Tasks      []Task
+	TaskStatus map[int]State // 任务状态
+	Mutex      sync.Mutex    // 锁
 }
 
 func MakeCoordinator(files []string, nReduce int) *Coordinator {
 	if nReduce <= 0 {
 		panic(fmt.Sprintf("nReduce must be positive, not %d", nReduce))
 	}
-	c := Coordinator{}
-	for i := 0; i < nReduce; i++ {
-		//对于每个文件，启动一个协程来处理
-		go c.handler(files[i], i)
-		if files[i] == "" {
-			break
-		}
+	c := Coordinator{
+		Tasks:      make([]Task, 0),
+		TaskStatus: make(map[int]State),
 	}
+	for i, file := range files {
+		task := Task{TaskType: MapTask, TaskID: i, ReduceNum: nReduce, FileName: file}
+		c.Tasks = append(c.Tasks, task)
+		c.TaskStatus[task.TaskID] = Waiting
+	}
+	task := Task{TaskType: ReduceTask, TaskID: len(files) + 1, ReduceNum: nReduce}
+	c.Tasks = append(c.Tasks, task)
+	c.TaskStatus[task.TaskID] = Waiting
 	c.server()
 	return &c
-}
-
-func (c *Coordinator) handler(files string, nReduce int) error {
-	//任务分配
-	c.Tasks = append(c.Tasks, Task{files: files,TaskType: MapTask, Filename: files, TaskID: nReduce})
-	c.State = Waiting
-	return nil
 }
 
 func (c *Coordinator) Done() bool {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
-	if c.State == AllDone {
-		fmt.Printf("All workers done\n")
-		return true // 应该返回true，表示所有工作都已完成
-	} else {
-		return false
+	for _, status := range c.TaskStatus {
+		if status != AllDone {
+			return false
+		}
 	}
+	fmt.Printf("All workers done\n")
+	return true
 }
 
-// start a thread that listens for RPCs from worker.go
 func (c *Coordinator) server() {
 	rpc.Register(c)
 	rpc.HandleHTTP()
-	//l, e := net.Listen("tcp", ":1234")
 	sockname := coordinatorSock()
 	os.Remove(sockname)
 	l, e := net.Listen("unix", sockname)
@@ -71,4 +58,39 @@ func (c *Coordinator) server() {
 		log.Fatal("listen error:", e)
 	}
 	go http.Serve(l, nil)
+}
+
+func (c *Coordinator) GetTasks(args *TaskArgs, reply *[]Task) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	// 初始化回复的任务切片
+	*reply = []Task{}
+
+	// 遍历所有任务，查找处于 Waiting 状态的任务
+	for _, task := range c.Tasks {
+		if c.TaskStatus[task.TaskID] == Waiting {
+			// 将任务添加到回复的任务切片中
+			*reply = append(*reply, task)
+			// 更新任务状态为 Working
+			c.TaskStatus[task.TaskID] = Working
+		}
+	}
+
+	// 如果没有找到任何任务，返回 nil
+	if len(*reply) == 0 {
+		return nil
+	}
+
+	return nil
+}
+
+func (c *Coordinator) DoneTask(args *TaskArgs, reply *Task) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	taskID := args.TaskID
+	c.TaskStatus[taskID] = AllDone
+
+	return nil
 }
