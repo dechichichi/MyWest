@@ -37,7 +37,7 @@ func Add(username string, password string, email string) (*database.User, error)
 	}
 
 	// 添加用户
-	newUser := database.User{ID: username, Password: password, Email: email}
+	newUser := database.User{UserName: username, Password: password, Email: email}
 	if err := db.Create(&newUser).Error; err != nil {
 		return nil, err
 	}

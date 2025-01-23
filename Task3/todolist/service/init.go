@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"todolist/config"
+	"todolist/database"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,7 +20,9 @@ func Init() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if err := db.AutoMigrate(database.User{}); err != nil {
+		return nil, fmt.Errorf("failed to migrate database: %w", err)
+	}
 	// 获取底层的 *sql.DB 对象
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -33,7 +36,6 @@ func Init() (*gorm.DB, error) {
 
 	return db, nil
 }
-
 func GetDSN() {
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		config.ConfigData.DB.Dbuser, config.ConfigData.DB.Dbpassword, config.ConfigData.DB.Dbhost, config.ConfigData.DB.Dbport, config.ConfigData.DB.Dbdatabase)

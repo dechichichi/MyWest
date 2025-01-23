@@ -12,8 +12,8 @@ type Data struct {
 	Views     int
 	Status    int
 	CreatedAt time.Time
-	StartTime time.Time `gorm:"default:CURRENT_TIMESTAMP"`
-	EndTime   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+	StartTime time.Time `gorm:"type:DATETIME;default:CURRENT_TIMESTAMP"`
+	EndTime   time.Time `gorm:"type:DATETIME;default:CURRENT_TIMESTAMP"`
 }
 
 // User 用户模型，包含用户信息和文章数据

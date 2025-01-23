@@ -13,12 +13,10 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/utils"
 )
 
-
-
 func Register(ctx context.Context, c *app.RequestContext) {
-	name := c.Query("username")
-	password := c.Query("password")
-	email := c.Query("email")
+	name := c.PostForm("username")
+	password := c.PostForm("password")
+	email := c.PostForm("email")
 	if _, err := service.Ask(name); err == nil {
 		c.JSON(http.StatusBadRequest, utils.H{
 			"message": "user already exists",
@@ -40,8 +38,8 @@ func Register(ctx context.Context, c *app.RequestContext) {
 }
 
 func Auth(ctx context.Context, c *app.RequestContext) {
-	name := c.Query("username")
-	password := c.Query("password")
+	name := c.PostForm("username")
+	password := c.PostForm("password")
 	if user, err := service.Auth(name, password); err != nil {
 		c.JSON(http.StatusUnauthorized, utils.H{
 			"message": err.Error(),
@@ -93,8 +91,8 @@ func Ping(ctx context.Context, c *app.RequestContext) {
 }
 
 func Login(ctx context.Context, c *app.RequestContext) {
-	name := c.Query("username")
-	pwd := c.Query("password")
+	name := c.PostForm("username")
+	pwd := c.PostForm("password")
 	// 验证用户名密码
 	err := service.TAsk(name, pwd)
 	if err != nil {

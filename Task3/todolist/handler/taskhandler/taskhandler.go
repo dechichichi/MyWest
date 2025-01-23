@@ -20,6 +20,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
+		return
 	}
 	c.JSON(http.StatusOK, utils.H{
 		"message": "success",
@@ -38,6 +39,7 @@ func CreateTask(ctx context.Context, c *app.RequestContext) {
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
+		return
 	}
 	service.CreateItem(user.ID, &data)
 	c.JSON(http.StatusOK, utils.H{
@@ -57,6 +59,7 @@ func UpdateTask(ctx context.Context, c *app.RequestContext) {
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
+		return
 	}
 	newstatues := c.PostForm("status")
 	if len(newstatues) == 0 {
@@ -64,6 +67,7 @@ func UpdateTask(ctx context.Context, c *app.RequestContext) {
 			"message": "invalid status",
 			"code":    http.StatusBadRequest,
 		})
+		return
 	}
 	service.UpdateItem(user.ID, &data, newstatues)
 }
@@ -79,6 +83,7 @@ func DeleteTask(ctx context.Context, c *app.RequestContext) {
 			"message": "invalid data",
 			"code":    http.StatusBadRequest,
 		})
+		return
 	}
 	service.DeleteItem(user.ID, &data)
 	c.JSON(http.StatusOK, utils.H{
